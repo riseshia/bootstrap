@@ -1,47 +1,58 @@
 #!/bin/bash
+function install {
+  echo installing $1
+  shift
+  sudo apt-get -y install "$@" >/dev/null 2>&1
+}
 
 cd ~
 
-echo updating package information >/dev/null 2>&1
+echo updating package information
 sudo apt-add-repository -y ppa:nginx/stable >/dev/null 2>&1
 sudo apt-get -y update >/dev/null 2>&1
 
-sudo apt-get install -y build-essential >/dev/null 2>&1
-sudo apt-get install -y software-properties-common >/dev/null 2>&1 
-sudo apt-get install -y python-software-properties >/dev/null 2>&1
+install 'build-essential' build-essential
+install 'software-properties-common' software-properties-common
+install 'python-software-properties' python-software-properties
 
 # Packages required for compilation of some stdlib modules
-sudo apt-get install -y tklib zlib1g-dev libssl-dev >/dev/null 2>&1
-sudo apt-get install -y libreadline-dev >/dev/null 2>&1
-sudo apt-get install -y libxml2 libxml2-dev libxslt1-dev libmysqlclient-dev >/dev/null 2>&1
-sudo apt-get install -y libsqlite3-dev >/dev/null 2>&1
-sudo apt-get install -y nodejs npm git >/dev/null 2>&1
-sudo apt-get install -y nginx >/dev/null 2>&1
+install Requirements tklib zlib1g-dev libssl-dev libreadline-dev libxml2 libxml2-dev libxslt1-dev libmysqlclient-dev
+install SQLite sqlite3 libsqlite3-dev
+install Git git
+install Nodejs nodejs npm
+install Nginx nginx
 
-# START rbenv setup #
+echo setup rbenv
 touch ~/.bash_profile
-sudo -u vagrant git clone git://github.com/sstephenson/rbenv.git ~/.rbenv >/dev/null 2>&1
-sudo -u vagrant echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
-sudo -u vagrant echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
-sudo -u vagrant git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build >/dev/null 2>&1
-sudo -u vagrant echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bash_profile
-sudo -u vagrant echo 'gem: --no-ri --no-rdoc' >> ~/.gemrc
-# END rbenv setup #
+git clone git://github.com/sstephenson/rbenv.git ~/.rbenv >/dev/null 2>&1
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build >/dev/null 2>&1
+echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bash_profile
+echo 'gem: --no-ri --no-rdoc' >> ~/.gemrc
+export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+eval "$(rbenv init -)"
 
-# START ruby setup #
-sudo -u vagrant -i rbenv install 2.2.3 >/dev/null 2>&1
-sudo -u vagrant -i rbenv global 2.2.3 >/dev/null 2>&1
-sudo -u vagrant -i rbenv rehash >/dev/null 2>&1
-sudo -u vagrant -i ruby -v >/dev/null 2>&1
-# END ruby setup #
+echo installing ruby
+rbenv install 2.3.0
+rbenv global 2.3.0
+rbenv rehash
+ruby -v
 
-echo installing rails >/dev/null 2>&1
-sudo -u vagrant -i gem install bundler >/dev/null 2>&1
-sudo -u vagrant -i gem install rails -v 4.2.4 -N >/dev/null 2>&1
-sudo -u vagrant -i rbenv rehash >/dev/null 2>&1
+echo installing rails
+gem install bundler
+gem install rails -v 4.2.5
+rbenv rehash
+
+echo 'installing global bower & gulp'
+sudo npm install -g bower >/dev/null 2>&1
+sudo npm install -g gulp >/dev/null 2>&1
 
 # Add symbolic
 sudo ln -s /usr/bin/nodejs /usr/bin/node >/dev/null 2>&1
 
 # Needed for docs generation.
-update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 >/dev/null 2>&1
+sudo update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8
+
+echo 'all set.'
