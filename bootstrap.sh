@@ -22,6 +22,8 @@ install Git git
 install Nodejs nodejs npm
 install Nginx nginx
 
+sudo rm /etc/nginx/site-enabled/default
+
 echo setup rbenv
 touch ~/.bash_profile
 git clone git://github.com/sstephenson/rbenv.git ~/.rbenv >/dev/null 2>&1
